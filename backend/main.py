@@ -12,9 +12,17 @@ app = FastAPI(
 )
 
 # 2. Add CORS Middleware
+# 2. Add CORS Middleware (Explicit origins required when credentials are true)
+origins = [
+    "http://127.0.0.1:5500",
+    "http://localhost:5500",
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -91,56 +99,86 @@ def get_analytics_summary():
 
 @app.get("/api/analytics/breakdown")
 def get_analytics_breakdown():
-  """Returns structured JSON data for dynamic Chart.js rendering."""
+  """Returns structured JSON data for 6 dynamic Chart.js visualizations."""
   if df is None:
     raise HTTPException(status_code=500, detail="Dataset not loaded")
 
-  sub_churn = (
-      (df.groupby("Subscription Type")["Churn"].mean() * 100)
-      .round(2)
-      .to_dict()
-  )
-  calls_churn = (
-      (df.groupby("Support Calls")["Churn"].mean() * 100).round(2).to_dict()
-  )
+  try:
+    # 1. Subscription Type Churn
+    sub_churn = (
+        (df.groupby("Subscription Type")["Churn"].mean() * 100)
+        .round(2)
+        .to_dict()
+    )
 
-  return {
-      "subscription_churn": {
-          "labels": list(sub_churn.keys()),
-          "data": list(sub_churn.values()),
-      },
-      "support_calls_churn": {
-          "labels": [f"{k} Calls" for k in calls_churn.keys()],
-          "data": list(calls_churn.values()),
-      },
-  }
+    # 2. Support Calls Churn
+    calls_churn = (
+        (df.groupby("Support Calls")["Churn"].mean() * 100).round(2).to_dict()
+    )
 
+    # 3. Contract Length Churn
+    contract_churn = (
+        (df.groupby("Contract Length")["Churn"].mean() * 100)
+        .round(2)
+        .to_dict()
+    )
 
-@app.post("/api/predict")
-def predict_churn(customer: CustomerFeatures):
-  """Accepts customer details and returns churn prediction probability."""
-  if model is None:
-    raise HTTPException(status_code=500, detail="Model pipeline not loaded")
+    # 4. Gender Churn
+    gender_churn = (
+        (df.groupby("Gender")["Churn"].mean() * 100).round(2).to_dict()
+    )
 
-  input_data = pd.DataFrame([{
-      "Age": customer.Age,
-      "Gender": customer.Gender,
-      "Tenure": customer.Tenure,
-      "Usage Frequency": customer.Usage_Frequency,
-      "Support Calls": customer.Support_Calls,
-      "Payment Delay": customer.Payment_Delay,
-      "Subscription Type": customer.Subscription_Type,
-      "Contract Length": customer.Contract_Length,
-      "Total Spend": customer.Total_Spend,
-      "Last Interaction": customer.Last_Interaction,
-  }])
+    # 5. Tenure Groups Churn
+    df_temp = df.copy()
+    df_temp["Tenure_Group"] = pd.cut(
+        df_temp["Tenure"],
+        bins=[-1, 12, 24, 48, df_temp["Tenure"].max() + 1],
+        labels=["0-1 Year", "1-2 Years", "2-4 Years", "4+ Years"],
+    )
+    tenure_churn = (
+        (df_temp.groupby("Tenure_Group", observed=False)["Churn"].mean() * 100)
+        .round(2)
+        .to_dict()
+    )
 
-  probability = float(model.predict_proba(input_data)[0][1])
-  prediction = int(probability >= 0.5)
+    # 6. Payment Delay Groups Churn
+    df_temp["Delay_Group"] = pd.cut(
+        df_temp["Payment Delay"],
+        bins=[-1, 10, 20, 30, df_temp["Payment Delay"].max() + 1],
+        labels=["0-10 Days", "11-20 Days", "21-30 Days", "30+ Days"],
+    )
+    delay_churn = (
+        (df_temp.groupby("Delay_Group", observed=False)["Churn"].mean() * 100)
+        .round(2)
+        .to_dict()
+    )
 
-  return {
-      "churn_prediction": prediction,
-      "prediction_label": "Churn" if prediction == 1 else "Retained",
-      "churn_probability": round(probability, 4),
-      "risk_level": "High" if probability >= 0.5 else "Low",
-  }
+    return {
+        "subscription_churn": {
+            "labels": [str(k) for k in sub_churn.keys()],
+            "data": [float(v) for v in sub_churn.values()],
+        },
+        "support_calls_churn": {
+            "labels": [f"{k} Calls" for k in calls_churn.keys()],
+            "data": [float(v) for v in calls_churn.values()],
+        },
+        "contract_churn": {
+            "labels": [str(k) for k in contract_churn.keys()],
+            "data": [float(v) for v in contract_churn.values()],
+        },
+        "gender_churn": {
+            "labels": [str(k) for k in gender_churn.keys()],
+            "data": [float(v) for v in gender_churn.values()],
+        },
+        "tenure_churn": {
+            "labels": [str(k) for k in tenure_churn.keys()],
+            "data": [0.0 if pd.isna(v) else float(v) for v in tenure_churn.values()],
+        },
+        "delay_churn": {
+            "labels": [str(k) for k in delay_churn.keys()],
+            "data": [0.0 if pd.isna(v) else float(v) for v in delay_churn.values()],
+        },
+    }
+  except Exception as e:
+    print(f"Error in breakdown endpoint: {str(e)}")
+    raise HTTPException(status_code=500, detail=str(e))

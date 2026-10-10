@@ -4,154 +4,165 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Churn Analytics & Prediction</title>
-    <!-- Tailwind CSS CDN for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Linking external stylesheet -->
+    <link rel="stylesheet" href="style.css">
     <!-- Chart.js CDN for dynamic interactive graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-50 text-gray-800 font-sans">
+<body>
 
     <!-- Header Navigation -->
-    <header class="bg-indigo-600 text-white p-6 shadow-md">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <h1 class="text-2xl font-bold">Customer Churn Intelligence Dashboard</h1>
-            <span class="text-sm bg-indigo-500 px-3 py-1 rounded-full text-indigo-100">FastAPI + Random Forest</span>
+    <header>
+        <div class="header-container">
+            <h1>Customer Churn Intelligence Dashboard</h1>
+            <span class="badge">FastAPI + Random Forest</span>
         </div>
     </header>
 
-    <main class="max-w-7xl mx-auto p-6 space-y-8">
+    <main>
 
         <!-- 1. KPI Summary Cards -->
-        <!-- Expanded KPI Summary Cards Grid -->
-<section>
-    <h2 class="text-xl font-semibold mb-4 text-gray-700">Dataset KPI Summary</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" id="kpi-cards">
-        
-        <!-- Row 1: Core Financial & Volume KPIs -->
-        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-indigo-500">
-            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Total Customers</p>
-            <p class="text-2xl font-bold text-gray-800" id="kpi-total">-</p>
-        </div>
+        <section>
+            <h2>Dataset KPI Summary</h2>
+            <div class="kpi-grid">
+                
+                <div class="kpi-card">
+                    <p class="kpi-title">Total Customers</p>
+                    <p class="kpi-value" id="kpi-total">-</p>
+                </div>
 
-        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-red-500">
-            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Overall Churn Rate</p>
-            <p class="text-2xl font-bold text-red-600" id="kpi-churn-rate">-</p>
-        </div>
+                <div class="kpi-card red">
+                    <p class="kpi-title">Overall Churn Rate</p>
+                    <p class="kpi-value" id="kpi-churn-rate" style="color: #dc2626;">-</p>
+                </div>
 
-        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-green-500">
-            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Retention Rate</p>
-            <p class="text-2xl font-bold text-green-600" id="kpi-retention-rate">-</p>
-        </div>
+                <div class="kpi-card green">
+                    <p class="kpi-title">Retention Rate</p>
+                    <p class="kpi-value" id="kpi-retention-rate" style="color: #16a34a;">-</p>
+                </div>
 
-        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-emerald-500">
-            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Total Dataset Revenue</p>
-            <p class="text-2xl font-bold text-emerald-600" id="kpi-revenue">-</p>
-        </div>
+                <div class="kpi-card emerald">
+                    <p class="kpi-title">Total Dataset Revenue</p>
+                    <p class="kpi-value" id="kpi-revenue" style="color: #059669;">-</p>
+                </div>
 
-        <!-- Row 2: Behavioral Risk Signals -->
-        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-amber-500">
-            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Avg Support Calls (Churned)</p>
-            <p class="text-2xl font-bold text-amber-600" id="kpi-calls">-</p>
-        </div>
+                <div class="kpi-card amber">
+                    <p class="kpi-title">Avg Support Calls (Churned)</p>
+                    <p class="kpi-value" id="kpi-calls" style="color: #d97706;">-</p>
+                </div>
 
-        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-orange-500">
-            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Avg Payment Delay (Churned)</p>
-            <p class="text-2xl font-bold text-orange-600" id="kpi-delay">-</p>
-        </div>
+                <div class="kpi-card orange">
+                    <p class="kpi-title">Avg Payment Delay (Churned)</p>
+                    <p class="kpi-value" id="kpi-delay" style="color: #ea580c;">-</p>
+                </div>
 
-        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-blue-500">
-            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Avg Customer Tenure</p>
-            <p class="text-2xl font-bold text-blue-600" id="kpi-tenure">-</p>
-        </div>
+                <div class="kpi-card blue">
+                    <p class="kpi-title">Avg Customer Tenure</p>
+                    <p class="kpi-value" id="kpi-tenure" style="color: #2563eb;">-</p>
+                </div>
 
-        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-purple-500">
-            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Avg Inactivity (Churned)</p>
-            <p class="text-2xl font-bold text-purple-600" id="kpi-inactivity">-</p>
-        </div>
+                <div class="kpi-card purple">
+                    <p class="kpi-title">Avg Inactivity (Churned)</p>
+                    <p class="kpi-value" id="kpi-inactivity" style="color: #9333ea;">-</p>
+                </div>
 
-    </div>
-</section>
+            </div>
+        </section>
 
-        <!-- 2. Dynamic Charts Section -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h3 class="text-lg font-semibold mb-4 text-gray-700">Churn Rate by Subscription Type</h3>
+        <!-- 2. Dynamic Charts Section (All 6 Charts) -->
+        <section class="charts-grid">
+            <div class="chart-card">
+                <h3>Churn Rate by Subscription Type</h3>
                 <canvas id="subChart"></canvas>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow">
-                <h3 class="text-lg font-semibold mb-4 text-gray-700">Churn Rate by Support Calls</h3>
+            <div class="chart-card">
+                <h3>Churn Rate by Support Calls</h3>
                 <canvas id="callsChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Churn Rate by Contract Length</h3>
+                <canvas id="contractChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Churn Rate by Gender</h3>
+                <canvas id="genderChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Churn Rate by Tenure Groups</h3>
+                <canvas id="tenureChart"></canvas>
+            </div>
+            <div class="chart-card">
+                <h3>Churn Rate by Payment Delay</h3>
+                <canvas id="delayChart"></canvas>
             </div>
         </section>
 
         <!-- 3. Real-Time Churn Prediction Form -->
-        <section class="bg-white p-6 rounded-lg shadow">
-            <h2 class="text-xl font-semibold mb-4 text-gray-700">Real-Time Churn Risk Predictor</h2>
+        <section class="prediction-section">
+            <h2>Real-Time Churn Risk Predictor</h2>
             
-            <form id="prediction-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Age</label>
-                    <input type="number" id="Age" value="35" class="w-full mt-1 p-2 border rounded-md" required>
+            <form id="prediction-form" class="form-grid">
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" id="Age" value="35" required>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Gender</label>
-                    <select id="Gender" class="w-full mt-1 p-2 border rounded-md">
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="Gender">
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Tenure (Months)</label>
-                    <input type="number" id="Tenure" value="12" class="w-full mt-1 p-2 border rounded-md" required>
+                <div class="form-group">
+                    <label>Tenure (Months)</label>
+                    <input type="number" id="Tenure" value="12" required>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Usage Frequency</label>
-                    <input type="number" id="Usage_Frequency" value="8" class="w-full mt-1 p-2 border rounded-md" required>
+                <div class="form-group">
+                    <label>Usage Frequency</label>
+                    <input type="number" id="Usage_Frequency" value="8" required>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Support Calls</label>
-                    <input type="number" id="Support_Calls" value="6" class="w-full mt-1 p-2 border rounded-md" required>
+                <div class="form-group">
+                    <label>Support Calls</label>
+                    <input type="number" id="Support_Calls" value="6" required>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Payment Delay (Days)</label>
-                    <input type="number" id="Payment_Delay" value="25" class="w-full mt-1 p-2 border rounded-md" required>
+                <div class="form-group">
+                    <label>Payment Delay (Days)</label>
+                    <input type="number" id="Payment_Delay" value="25" required>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Subscription Type</label>
-                    <select id="Subscription_Type" class="w-full mt-1 p-2 border rounded-md">
+                <div class="form-group">
+                    <label>Subscription Type</label>
+                    <select id="Subscription_Type">
                         <option value="Basic">Basic</option>
                         <option value="Standard">Standard</option>
                         <option value="Premium">Premium</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Contract Length</label>
-                    <select id="Contract_Length" class="w-full mt-1 p-2 border rounded-md">
+                <div class="form-group">
+                    <label>Contract Length</label>
+                    <select id="Contract_Length">
                         <option value="Monthly">Monthly</option>
                         <option value="Annual">Annual</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600">Total Spend ($)</label>
-                    <input type="number" id="Total_Spend" value="300" class="w-full mt-1 p-2 border rounded-md" required>
+                <div class="form-group">
+                    <label>Total Spend ($)</label>
+                    <input type="number" id="Total_Spend" value="300" required>
                 </div>
-                <div class="col-span-1 md:col-span-2 lg:col-span-3">
-                    <label class="block text-sm font-medium text-gray-600">Last Interaction (Days Ago)</label>
-                    <input type="number" id="Last_Interaction" value="15" class="w-full mt-1 p-2 border rounded-md" required>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label>Last Interaction (Days Ago)</label>
+                    <input type="number" id="Last_Interaction" value="15" required>
                 </div>
 
-                <div class="col-span-1 md:col-span-2 lg:col-span-3 mt-2">
-                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold p-3 rounded-md transition duration-200">
-                        Predict Churn Risk
-                    </button>
+                <div style="grid-column: 1 / -1; margin-top: 1rem;">
+                    <button type="submit" class="btn-primary">Predict Churn Risk</button>
                 </div>
             </form>
 
-            <!-- Output Result Modal / Box -->
-            <div id="result-box" class="hidden mt-6 p-4 rounded-md border text-center">
-                <p class="text-sm text-gray-500">Churn Probability</p>
-                <p class="text-3xl font-extrabold my-1" id="prob-val">0%</p>
-                <span id="risk-badge" class="px-3 py-1 rounded-full text-sm font-semibold">Low Risk</span>
+            <!-- Output Result Box -->
+            <div id="result-box" class="result-box hidden">
+                <p style="font-size: 0.875rem; color: var(--text-muted); margin: 0;">Churn Probability</p>
+                <p id="prob-val" style="font-size: 2rem; font-weight: 800; margin: 0.25rem 0;">0%</p>
+                <span id="risk-badge" class="risk-badge">Low Risk</span>
             </div>
         </section>
 
@@ -161,38 +172,36 @@
     <script>
         const API_BASE = 'http://127.0.0.1:8000';
 
-        // 1. Fetch Summary Statistics
-     async function fetchSummary() {
-    try {
-        const res = await fetch(`${API_BASE}/api/analytics/summary`);
-        const data = await res.json();
-        console.log("Analytics Payload Received:", data); // Check browser console (F12)
+        async function fetchSummary() {
+            try {
+                const res = await fetch(`${API_BASE}/api/analytics/summary`);
+                const data = await res.json();
 
-        const setElementText = (id, text) => {
-            const el = document.getElementById(id);
-            if (el) el.innerText = text;
-        };
+                const setElementText = (id, text) => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerText = text;
+                };
 
-        setElementText('kpi-total', data.total_customers ? data.total_customers.toLocaleString() : '-');
-        setElementText('kpi-churn-rate', data.churn_rate_pct !== undefined ? `${data.churn_rate_pct}%` : '-');
-        setElementText('kpi-retention-rate', data.retention_rate_pct !== undefined ? `${data.retention_rate_pct}%` : '-');
-        setElementText('kpi-revenue', data.total_revenue !== undefined ? `$${data.total_revenue.toLocaleString()}` : '-');
-        setElementText('kpi-calls', data.avg_support_calls_churned !== undefined ? `${data.avg_support_calls_churned} calls` : '-');
-        setElementText('kpi-delay', data.avg_payment_delay_churned !== undefined ? `${data.avg_payment_delay_churned} days` : '-');
-        setElementText('kpi-tenure', data.avg_tenure_months !== undefined ? `${data.avg_tenure_months} months` : '-');
-        setElementText('kpi-inactivity', data.avg_last_interaction_days !== undefined ? `${data.avg_last_interaction_days} days ago` : '-');
+                setElementText('kpi-total', data.total_customers ? data.total_customers.toLocaleString() : '-');
+                setElementText('kpi-churn-rate', data.churn_rate_pct !== undefined ? `${data.churn_rate_pct}%` : '-');
+                setElementText('kpi-retention-rate', data.retention_rate_pct !== undefined ? `${data.retention_rate_pct}%` : '-');
+                setElementText('kpi-revenue', data.total_revenue !== undefined ? `$${data.total_revenue.toLocaleString()}` : '-');
+                setElementText('kpi-calls', data.avg_support_calls_churned !== undefined ? data.avg_support_calls_churned : '-');
+                setElementText('kpi-delay', data.avg_payment_delay_churned !== undefined ? `${data.avg_payment_delay_churned} days` : '-');
+                setElementText('kpi-tenure', data.avg_tenure_months !== undefined ? `${data.avg_tenure_months} mo` : '-');
+                setElementText('kpi-inactivity', data.avg_last_interaction_days !== undefined ? `${data.avg_last_interaction_days} days` : '-');
 
-    } catch (err) {
-        console.error('Error fetching expanded KPI summary:', err);
-    }
-}
-        // 2. Fetch Dynamic JSON for Chart.js
+            } catch (err) {
+                console.error('Error fetching KPI summary:', err);
+            }
+        }
+
         async function fetchCharts() {
             try {
                 const res = await fetch(`${API_BASE}/api/analytics/breakdown`);
                 const data = await res.json();
 
-                // Subscription Chart
+                // 1. Subscription Chart
                 new Chart(document.getElementById('subChart'), {
                     type: 'bar',
                     data: {
@@ -206,7 +215,7 @@
                     options: { responsive: true, scales: { y: { beginAtZero: true } } }
                 });
 
-                // Support Calls Chart
+                // 2. Support Calls Chart
                 new Chart(document.getElementById('callsChart'), {
                     type: 'line',
                     data: {
@@ -222,12 +231,80 @@
                     },
                     options: { responsive: true, scales: { y: { beginAtZero: true } } }
                 });
+
+                // 3. Contract Length Chart
+                const contractCanvas = document.getElementById('contractChart');
+                if (contractCanvas) {
+                    new Chart(contractCanvas, {
+                        type: 'bar',
+                        data: {
+                            labels: data.contract_churn.labels,
+                            datasets: [{
+                                label: 'Churn Rate (%)',
+                                data: data.contract_churn.data,
+                                backgroundColor: '#10B981'
+                            }]
+                        },
+                        options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+                    });
+                }
+
+                // 4. Gender Chart
+                const genderCanvas = document.getElementById('genderChart');
+                if (genderCanvas) {
+                    new Chart(genderCanvas, {
+                        type: 'bar',
+                        data: {
+                            labels: data.gender_churn.labels,
+                            datasets: [{
+                                label: 'Churn Rate (%)',
+                                data: data.gender_churn.data,
+                                backgroundColor: '#3B82F6'
+                            }]
+                        },
+                        options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+                    });
+                }
+
+                // 5. Tenure Groups Chart
+                const tenureCanvas = document.getElementById('tenureChart');
+                if (tenureCanvas) {
+                    new Chart(tenureCanvas, {
+                        type: 'bar',
+                        data: {
+                            labels: data.tenure_churn.labels,
+                            datasets: [{
+                                label: 'Churn Rate (%)',
+                                data: data.tenure_churn.data,
+                                backgroundColor: '#F59E0B'
+                            }]
+                        },
+                        options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+                    });
+                }
+
+                // 6. Payment Delay Chart
+                const delayCanvas = document.getElementById('delayChart');
+                if (delayCanvas) {
+                    new Chart(delayCanvas, {
+                        type: 'bar',
+                        data: {
+                            labels: data.delay_churn.labels,
+                            datasets: [{
+                                label: 'Churn Rate (%)',
+                                data: data.delay_churn.data,
+                                backgroundColor: '#A855F7'
+                            }]
+                        },
+                        options: { responsive: true, scales: { y: { beginAtZero: true, max: 100 } } }
+                    });
+                }
+
             } catch (err) {
                 console.error('Error fetching breakdown analytics:', err);
             }
         }
 
-        // 3. Handle Prediction Submission
         document.getElementById('prediction-form').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -260,14 +337,18 @@
                 probVal.innerText = `${(result.churn_probability * 100).toFixed(1)}%`;
 
                 if (result.risk_level === 'High') {
-                    box.className = 'mt-6 p-4 rounded-md border border-red-300 bg-red-50 text-center';
-                    probVal.className = 'text-3xl font-extrabold my-1 text-red-600';
-                    badge.className = 'px-3 py-1 rounded-full text-sm font-semibold bg-red-200 text-red-800';
+                    box.style.borderColor = '#fca5a5';
+                    box.style.backgroundColor = '#fef2f2';
+                    probVal.style.color = '#dc2626';
+                    badge.style.backgroundColor = '#fee2e2';
+                    badge.style.color = '#991b1b';
                     badge.innerText = 'High Churn Risk';
                 } else {
-                    box.className = 'mt-6 p-4 rounded-md border border-green-300 bg-green-50 text-center';
-                    probVal.className = 'text-3xl font-extrabold my-1 text-green-600';
-                    badge.className = 'px-3 py-1 rounded-full text-sm font-semibold bg-green-200 text-green-800';
+                    box.style.borderColor = '#86efac';
+                    box.style.backgroundColor = '#f0fdf4';
+                    probVal.style.color = '#16a34a';
+                    badge.style.backgroundColor = '#dcfce7';
+                    badge.style.color = '#166534';
                     badge.innerText = 'Low Risk (Retained)';
                 }
             } catch (err) {
@@ -275,7 +356,6 @@
             }
         });
 
-        // Initialize dashboard on load
         fetchSummary();
         fetchCharts();
     </script>

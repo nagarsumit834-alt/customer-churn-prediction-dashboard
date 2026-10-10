@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Churn Analytics & Prediction</title>
+    <!-- Tailwind CSS CDN for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN for dynamic interactive graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <!-- Header Navigation -->
+    <header class="bg-indigo-600 text-white p-6 shadow-md">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-bold">Customer Churn Intelligence Dashboard</h1>
+            <span class="text-sm bg-indigo-500 px-3 py-1 rounded-full text-indigo-100">FastAPI + Random Forest</span>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto p-6 space-y-8">
+
+        <!-- 1. KPI Summary Cards -->
+        <!-- Expanded KPI Summary Cards Grid -->
+<section>
+    <h2 class="text-xl font-semibold mb-4 text-gray-700">Dataset KPI Summary</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" id="kpi-cards">
+        
+        <!-- Row 1: Core Financial & Volume KPIs -->
+        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-indigo-500">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Total Customers</p>
+            <p class="text-2xl font-bold text-gray-800" id="kpi-total">-</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-red-500">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Overall Churn Rate</p>
+            <p class="text-2xl font-bold text-red-600" id="kpi-churn-rate">-</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-green-500">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Retention Rate</p>
+            <p class="text-2xl font-bold text-green-600" id="kpi-retention-rate">-</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-emerald-500">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Total Dataset Revenue</p>
+            <p class="text-2xl font-bold text-emerald-600" id="kpi-revenue">-</p>
+        </div>
+
+        <!-- Row 2: Behavioral Risk Signals -->
+        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-amber-500">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Avg Support Calls (Churned)</p>
+            <p class="text-2xl font-bold text-amber-600" id="kpi-calls">-</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-orange-500">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Avg Payment Delay (Churned)</p>
+            <p class="text-2xl font-bold text-orange-600" id="kpi-delay">-</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-blue-500">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Avg Customer Tenure</p>
+            <p class="text-2xl font-bold text-blue-600" id="kpi-tenure">-</p>
+        </div>
+
+        <div class="bg-white p-5 rounded-lg shadow border-l-4 border-purple-500">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gray-500">Avg Inactivity (Churned)</p>
+            <p class="text-2xl font-bold text-purple-600" id="kpi-inactivity">-</p>
+        </div>
+
+    </div>
+</section>
+
+        <!-- 2. Dynamic Charts Section -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-lg font-semibold mb-4 text-gray-700">Churn Rate by Subscription Type</h3>
+                <canvas id="subChart"></canvas>
+            </div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h3 class="text-lg font-semibold mb-4 text-gray-700">Churn Rate by Support Calls</h3>
+                <canvas id="callsChart"></canvas>
+            </div>
+        </section>
+
+        <!-- 3. Real-Time Churn Prediction Form -->
+        <section class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-xl font-semibold mb-4 text-gray-700">Real-Time Churn Risk Predictor</h2>
+            
+            <form id="prediction-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Age</label>
+                    <input type="number" id="Age" value="35" class="w-full mt-1 p-2 border rounded-md" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Gender</label>
+                    <select id="Gender" class="w-full mt-1 p-2 border rounded-md">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Tenure (Months)</label>
+                    <input type="number" id="Tenure" value="12" class="w-full mt-1 p-2 border rounded-md" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Usage Frequency</label>
+                    <input type="number" id="Usage_Frequency" value="8" class="w-full mt-1 p-2 border rounded-md" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Support Calls</label>
+                    <input type="number" id="Support_Calls" value="6" class="w-full mt-1 p-2 border rounded-md" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Payment Delay (Days)</label>
+                    <input type="number" id="Payment_Delay" value="25" class="w-full mt-1 p-2 border rounded-md" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Subscription Type</label>
+                    <select id="Subscription_Type" class="w-full mt-1 p-2 border rounded-md">
+                        <option value="Basic">Basic</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Premium">Premium</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Contract Length</label>
+                    <select id="Contract_Length" class="w-full mt-1 p-2 border rounded-md">
+                        <option value="Monthly">Monthly</option>
+                        <option value="Annual">Annual</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-600">Total Spend ($)</label>
+                    <input type="number" id="Total_Spend" value="300" class="w-full mt-1 p-2 border rounded-md" required>
+                </div>
+                <div class="col-span-1 md:col-span-2 lg:col-span-3">
+                    <label class="block text-sm font-medium text-gray-600">Last Interaction (Days Ago)</label>
+                    <input type="number" id="Last_Interaction" value="15" class="w-full mt-1 p-2 border rounded-md" required>
+                </div>
+
+                <div class="col-span-1 md:col-span-2 lg:col-span-3 mt-2">
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold p-3 rounded-md transition duration-200">
+                        Predict Churn Risk
+                    </button>
+                </div>
+            </form>
+
+            <!-- Output Result Modal / Box -->
+            <div id="result-box" class="hidden mt-6 p-4 rounded-md border text-center">
+                <p class="text-sm text-gray-500">Churn Probability</p>
+                <p class="text-3xl font-extrabold my-1" id="prob-val">0%</p>
+                <span id="risk-badge" class="px-3 py-1 rounded-full text-sm font-semibold">Low Risk</span>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+
+        // 1. Fetch Summary Statistics
+     async function fetchSummary() {
+    try {
+        const res = await fetch(`${API_BASE}/api/analytics/summary`);
+        const data = await res.json();
+        console.log("Analytics Payload Received:", data); // Check browser console (F12)
+
+        const setElementText = (id, text) => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = text;
+        };
+
+        setElementText('kpi-total', data.total_customers ? data.total_customers.toLocaleString() : '-');
+        setElementText('kpi-churn-rate', data.churn_rate_pct !== undefined ? `${data.churn_rate_pct}%` : '-');
+        setElementText('kpi-retention-rate', data.retention_rate_pct !== undefined ? `${data.retention_rate_pct}%` : '-');
+        setElementText('kpi-revenue', data.total_revenue !== undefined ? `$${data.total_revenue.toLocaleString()}` : '-');
+        setElementText('kpi-calls', data.avg_support_calls_churned !== undefined ? `${data.avg_support_calls_churned} calls` : '-');
+        setElementText('kpi-delay', data.avg_payment_delay_churned !== undefined ? `${data.avg_payment_delay_churned} days` : '-');
+        setElementText('kpi-tenure', data.avg_tenure_months !== undefined ? `${data.avg_tenure_months} months` : '-');
+        setElementText('kpi-inactivity', data.avg_last_interaction_days !== undefined ? `${data.avg_last_interaction_days} days ago` : '-');
+
+    } catch (err) {
+        console.error('Error fetching expanded KPI summary:', err);
+    }
+}
+        // 2. Fetch Dynamic JSON for Chart.js
+        async function fetchCharts() {
+            try {
+                const res = await fetch(`${API_BASE}/api/analytics/breakdown`);
+                const data = await res.json();
+
+                // Subscription Chart
+                new Chart(document.getElementById('subChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: data.subscription_churn.labels,
+                        datasets: [{
+                            label: 'Churn Rate (%)',
+                            data: data.subscription_churn.data,
+                            backgroundColor: ['#6366F1', '#3B82F6', '#10B981']
+                        }]
+                    },
+                    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                });
+
+                // Support Calls Chart
+                new Chart(document.getElementById('callsChart'), {
+                    type: 'line',
+                    data: {
+                        labels: data.support_calls_churn.labels,
+                        datasets: [{
+                            label: 'Churn Rate (%)',
+                            data: data.support_calls_churn.data,
+                            borderColor: '#EF4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: { responsive: true, scales: { y: { beginAtZero: true } } }
+                });
+            } catch (err) {
+                console.error('Error fetching breakdown analytics:', err);
+            }
+        }
+
+        // 3. Handle Prediction Submission
+        document.getElementById('prediction-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const payload = {
+                Age: parseInt(document.getElementById('Age').value),
+                Gender: document.getElementById('Gender').value,
+                Tenure: parseInt(document.getElementById('Tenure').value),
+                Usage_Frequency: parseInt(document.getElementById('Usage_Frequency').value),
+                Support_Calls: parseInt(document.getElementById('Support_Calls').value),
+                Payment_Delay: parseInt(document.getElementById('Payment_Delay').value),
+                Subscription_Type: document.getElementById('Subscription_Type').value,
+                Contract_Length: document.getElementById('Contract_Length').value,
+                Total_Spend: parseInt(document.getElementById('Total_Spend').value),
+                Last_Interaction: parseInt(document.getElementById('Last_Interaction').value)
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/api/predict`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+
+                const box = document.getElementById('result-box');
+                const probVal = document.getElementById('prob-val');
+                const badge = document.getElementById('risk-badge');
+
+                box.classList.remove('hidden');
+                probVal.innerText = `${(result.churn_probability * 100).toFixed(1)}%`;
+
+                if (result.risk_level === 'High') {
+                    box.className = 'mt-6 p-4 rounded-md border border-red-300 bg-red-50 text-center';
+                    probVal.className = 'text-3xl font-extrabold my-1 text-red-600';
+                    badge.className = 'px-3 py-1 rounded-full text-sm font-semibold bg-red-200 text-red-800';
+                    badge.innerText = 'High Churn Risk';
+                } else {
+                    box.className = 'mt-6 p-4 rounded-md border border-green-300 bg-green-50 text-center';
+                    probVal.className = 'text-3xl font-extrabold my-1 text-green-600';
+                    badge.className = 'px-3 py-1 rounded-full text-sm font-semibold bg-green-200 text-green-800';
+                    badge.innerText = 'Low Risk (Retained)';
+                }
+            } catch (err) {
+                console.error('Error submitting prediction:', err);
+            }
+        });
+
+        // Initialize dashboard on load
+        fetchSummary();
+        fetchCharts();
+    </script>
+</body>
+</html>

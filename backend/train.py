@@ -7,14 +7,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 
-# 1. Load dataset (10,000 rows sample)
+# 1. Load dataset
 df = pd.read_csv("backend/customer_churn_dataset.csv", nrows=10000)
 
 # 2. Define Features (X) and Target (y)
-X = df.drop(columns=["CustomerID", "Churn"])
+X = df.drop(columns=["CustomerID", "Churn","Gender"])
 y = df["Churn"]
 
-categorical_cols = ["Gender", "Subscription Type", "Contract Length"]
+categorical_cols = [ "Subscription Type", "Contract Length"]
 
 # 3. Create Preprocessing & Model Pipeline
 preprocessor = ColumnTransformer(
@@ -24,13 +24,17 @@ preprocessor = ColumnTransformer(
     remainder="passthrough",
 )
 
+# Tuned Random Forest with stronger penalty for missing churners
 pipeline = Pipeline(
     steps=[
         ("preprocessor", preprocessor),
         (
             "classifier",
             RandomForestClassifier(
-                n_estimators=100, random_state=42, class_weight="balanced"
+                n_estimators=150,
+                max_depth=12,
+                class_weight={0: 1.0, 1: 2.5},  # Custom weight to boost churn prediction sensitivity
+                random_state=42
             ),
         ),
     ]
@@ -42,7 +46,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # 5. Train Model
-print("Training Random Forest model...")
+print("Training tuned Random Forest model...")
 pipeline.fit(X_train, y_train)
 
 # 6. Evaluate Performance

@@ -182,3 +182,30 @@ def get_analytics_breakdown():
   except Exception as e:
     print(f"Error in breakdown endpoint: {str(e)}")
     raise HTTPException(status_code=500, detail=str(e))
+@app.post("/api/predict")
+def predict_churn(customer: CustomerFeatures):
+  """Accepts customer details and returns churn prediction probability."""
+  if model is None:
+    raise HTTPException(status_code=500, detail="Model pipeline not loaded")
+
+  input_data = pd.DataFrame([{
+      "Age": customer.Age,
+      "Tenure": customer.Tenure,
+      "Usage Frequency": customer.Usage_Frequency,
+      "Support Calls": customer.Support_Calls,
+      "Payment Delay": customer.Payment_Delay,
+      "Subscription Type": customer.Subscription_Type,
+      "Contract Length": customer.Contract_Length,
+      "Total Spend": customer.Total_Spend,
+      "Last Interaction": customer.Last_Interaction,
+  }])
+
+  probability = float(model.predict_proba(input_data)[0][1])
+  prediction = int(probability >= 0.5)
+
+  return {
+      "churn_prediction": prediction,
+      "prediction_label": "Churn" if prediction == 1 else "Retained",
+      "churn_probability": round(probability, 4),
+      "risk_level": "High" if probability >= 0.5 else "Low",
+  }
